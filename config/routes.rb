@@ -2,6 +2,10 @@ Rails.application.routes.draw do
   resources :purchases
   devise_for :users
 
+  devise_scope :user do
+    get "/sign_in", :to => "devise/sessions#new"
+  end
+
   resources :purchases do
     post 'add', to: 'purchases#addPurchase', on: :member
     get 'check', to: 'purchases#getPurchase', on: :member
