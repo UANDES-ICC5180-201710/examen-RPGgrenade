@@ -21,6 +21,43 @@ class PurchasesController < ApplicationController
   def edit
   end
 
+  def addPurchase
+    game_id = params[:id]
+    @purchase = Purchase.new
+    @purchase.game_id = game_id
+    @purchase.user_id = current_user.id
+    puts @purchase
+    @purchase.save
+    jsonObj = { "ipurchasedIt" => checkPurchase(game_id) }
+    respond_to do |format|
+      format.json { render json: jsonObj }
+    end
+  end
+
+  def checkPurchase(game_id)
+    return current_user.purchases.where('game_id = ?', "#{game_id}").length > 0
+  end
+
+  def getPurchase()
+    game_id = params[:id]
+    @purchase = current_user.purchases.where('game_id = ?', "#{game_id}").first
+    jsonObj = { "ipurchasedIt" => checkPurchase(game_id) }
+    respond_to do |format|
+      format.json { render json: jsonObj }
+    end
+  end
+
+  def removePurchase
+    game_id = params[:id]
+    @purchase = current_user.purchases.where('game_id = ?', "#{game_id}").first
+    Purchase.destroy(@purchase.id)
+    puts checkPurchase(game_id)
+    jsonObj = {"ipurchasedIt" => checkPurchase(game_id)}
+    respond_to do |format|
+      format.json { render json: jsonObj }
+    end
+  end
+
   # POST /purchases
   # POST /purchases.json
   def create
